@@ -3,20 +3,21 @@
 One set of lint, format, TypeScript and CI conventions for all my repos. Each repo consumes it
 instead of carrying its own copy.
 
-| Export                                                 | What it is                                            |
-| ------------------------------------------------------ | ----------------------------------------------------- |
-| `@yaniv120892/dev-config/eslint`                       | ESLint flat config: JS + TypeScript, my code rules    |
-| `@yaniv120892/dev-config/eslint/node`                  | The base plus Node globals                            |
-| `@yaniv120892/dev-config/eslint/next`                  | The base plus `eslint-config-next/core-web-vitals`    |
-| `@yaniv120892/dev-config/prettier`                     | Prettier config                                       |
-| `@yaniv120892/dev-config/lint-staged`                  | lint-staged config for the pre-commit hook            |
-| `@yaniv120892/dev-config/tsconfig/{preset}`            | `base`, `node`, `next`, `library`                     |
-| `yaniv120892/dev-config/.github/workflows/node-ci.yml` | Reusable CI job: format, lint, typecheck, test, build |
+| Export                                                 | What it is                                                        |
+| ------------------------------------------------------ | ----------------------------------------------------------------- |
+| `@yaniv120892/dev-config/eslint`                       | ESLint flat config: JS + TypeScript, my code rules                |
+| `@yaniv120892/dev-config/eslint/node`                  | The base plus Node globals                                        |
+| `@yaniv120892/dev-config/eslint/next`                  | The base plus `eslint-config-next/core-web-vitals`                |
+| `@yaniv120892/dev-config/eslint/react`                 | The base plus the React hooks rules, for a non-Next React package |
+| `@yaniv120892/dev-config/prettier`                     | Prettier config                                                   |
+| `@yaniv120892/dev-config/lint-staged`                  | lint-staged config for the pre-commit hook                        |
+| `@yaniv120892/dev-config/tsconfig/{preset}`            | `base`, `node`, `next`, `library`                                 |
+| `yaniv120892/dev-config/.github/workflows/node-ci.yml` | Reusable CI job: format, lint, typecheck, test, build             |
 
 ## Install
 
 ```bash
-npm install -D github:yaniv120892/dev-config#v0.1.2 eslint prettier typescript husky lint-staged
+npm install -D github:yaniv120892/dev-config#v0.1.3 eslint prettier typescript husky lint-staged
 ```
 
 A Next.js app also needs `eslint-config-next` at the version matching its `next`; a Node service
@@ -87,7 +88,7 @@ permissions:
   contents: read
 jobs:
   gate:
-    uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.1.2
+    uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.1.3
 ```
 
 A job that needs a database or a browser stays a separate job in the repo, calling the same

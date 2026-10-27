@@ -4,6 +4,7 @@ import { ESLint } from 'eslint';
 import base from '../eslint/index.js';
 import next from '../eslint/next.js';
 import node from '../eslint/node.js';
+import react from '../eslint/react.js';
 
 const engines = new Map();
 
@@ -151,6 +152,22 @@ describe('next ESLint config', () => {
     ].join('\n');
     const ruleIds = await ruleIdsFor({ config: next, code, filePath: 'src/app/page.tsx' });
     assert.ok(ruleIds.includes('@next/next/no-img-element'));
+    assert.ok(ruleIds.includes('no-restricted-syntax'));
+  });
+});
+
+describe('react ESLint config', () => {
+  it('runs the hooks rules alongside the base rules', async () => {
+    const code = [
+      'import { useState } from "react";',
+      'export interface Props { open: boolean }',
+      'export function Panel({ open }: Props) {',
+      '  if (open) { const [count] = useState(0); return <p>{count}</p>; }',
+      '  return null;',
+      '}',
+    ].join('\n');
+    const ruleIds = await ruleIdsFor({ config: react, code, filePath: 'src/Panel.tsx' });
+    assert.ok(ruleIds.includes('react-hooks/rules-of-hooks'));
     assert.ok(ruleIds.includes('no-restricted-syntax'));
   });
 });
