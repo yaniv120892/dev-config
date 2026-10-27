@@ -103,10 +103,7 @@ export default defineConfig(
     name: 'dev-config/typescript',
     files: ['**/*.{ts,tsx,mts,cts}'],
     rules: {
-      '@typescript-eslint/explicit-member-accessibility': [
-        'error',
-        { overrides: { constructors: 'no-public' } },
-      ],
+      '@typescript-eslint/explicit-member-accessibility': 'error',
     },
   },
   {
