@@ -17,11 +17,13 @@ instead of carrying its own copy.
 ## Install
 
 ```bash
-npm install -D github:yaniv120892/dev-config#v0.1.4 eslint prettier typescript husky lint-staged
+npm install -D github:yaniv120892/dev-config#v0.1.5 eslint prettier typescript husky lint-staged
 ```
 
-A Next.js app also needs `eslint-config-next` at the version matching its `next`; a Node service
-extending `tsconfig/node.json` needs `@types/node`.
+A Next.js app also needs `eslint-config-next` at the version matching its `next` (install
+`eslint@10` first: the plugins it bundles still declare an `eslint ^9` peer, so a combined install
+over an ESLint 9 lockfile fails with `ERESOLVE`); a React package using the `react` preset needs
+`eslint-plugin-react-hooks`; a Node service extending `tsconfig/node.json` needs `@types/node`.
 
 ## Use
 
@@ -88,7 +90,7 @@ permissions:
   contents: read
 jobs:
   gate:
-    uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.1.4
+    uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.1.5
 ```
 
 A job that needs a database or a browser stays a separate job in the repo, calling the same
