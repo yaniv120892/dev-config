@@ -42,6 +42,12 @@ jobs:
       # --if-present: a plain-JS repo has no typecheck, a service may have no build.
       - run: npm run typecheck --if-present
       - run: npm test
+      - if: hashFiles('next.config.*') != ''
+        uses: actions/cache@v6
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'app/**', 'pages/**') }}
+          restore-keys: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
       - run: npm run build --if-present
         env:
           NODE_OPTIONS: ${{ inputs.build-node-options }}
