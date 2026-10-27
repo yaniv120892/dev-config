@@ -33,7 +33,8 @@ jobs:
       - if: inputs.audit
         run: npm audit --omit=dev --audit-level=critical
       - run: npm run format:check
-      - run: npm run lint
+      # Fails on warnings too: eslint-config-next leaves many rules at warn, and eslint exits 0 on them.
+      - run: npm run lint -- --max-warnings=0
       # --if-present: a plain-JS repo has no typecheck, a service may have no build.
       - run: npm run typecheck --if-present
       - run: npm test

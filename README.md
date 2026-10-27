@@ -8,8 +8,8 @@ instead of carrying its own copy.
 | `@yaniv120892/dev-config/eslint`                       | ESLint flat config: JS + TypeScript, my code rules    |
 | `@yaniv120892/dev-config/eslint/node`                  | The base plus Node globals                            |
 | `@yaniv120892/dev-config/eslint/next`                  | The base plus `eslint-config-next/core-web-vitals`    |
-| `@yaniv120892/dev-config/prettier`                     | Single quotes, width 100, trailing commas             |
-| `@yaniv120892/dev-config/lint-staged`                  | `eslint --fix` + `prettier --write` on staged files   |
+| `@yaniv120892/dev-config/prettier`                     | Prettier config                                       |
+| `@yaniv120892/dev-config/lint-staged`                  | lint-staged config for the pre-commit hook            |
 | `@yaniv120892/dev-config/tsconfig/{preset}`            | `base`, `node`, `next`, `library`                     |
 | `yaniv120892/dev-config/.github/workflows/node-ci.yml` | Reusable CI job: format, lint, typecheck, test, build |
 
@@ -19,7 +19,8 @@ instead of carrying its own copy.
 npm install -D github:yaniv120892/dev-config#v0.1.0 eslint prettier typescript husky lint-staged
 ```
 
-A Next.js app also needs `eslint-config-next` at the version matching its `next`.
+A Next.js app also needs `eslint-config-next` at the version matching its `next`; a Node service
+extending `tsconfig/node.json` needs `@types/node`.
 
 ## Use
 
@@ -89,21 +90,27 @@ jobs:
     uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.1.0
 ```
 
-Inputs: `node-version` (default `22`), `audit` (default `false`), `build-node-options`. A job
-that needs a database or a browser stays a separate job in the repo, calling the same scripts.
+A job that needs a database or a browser stays a separate job in the repo, calling the same
+scripts. The workflow's inputs are in `.github/workflows/node-ci.yml`.
 
 ## Rules
 
-Every rule is an error. The non-default ones enforce my code conventions:
+`eslint/index.js` is the list. Its non-default rules enforce the code conventions in my Claude rules
+(`~/.claude/rules/code.md`, `typescript.md`), so review comments about braces, casts, `interface`
+or abbreviations become lint errors instead. CI runs lint with `--max-warnings=0`, so the rules
+`eslint-config-next` leaves at `warn` fail the gate too.
 
-- Braces on every `if`/loop body (`curly`).
-- `type`, never `interface`; `T[]`, never `Array<T>`; `import type` for types.
-- No `as` casts (`as const` is allowed) and no `!` non-null assertions.
-- `public`/`private`/`protected` on every class member.
-- No abbreviated identifiers (`cfg`, `ctx`, `req`, `res`, `msg`, …).
-- `async`/`await`, never `.then()` chains.
-- `switch` needs a `default`; loops keep their stop condition in the header.
-- An `eslint-disable` needs a `-- reason`, and an unused one is an error.
+A repo that sets its own `no-restricted-syntax` replaces ours, since rule options do not merge.
+Spread ours back in:
+
+```js
+import base, { restrictedSyntax } from '@yaniv120892/dev-config/eslint';
+
+export default [
+  ...base,
+  { rules: { 'no-restricted-syntax': ['error', ...restrictedSyntax, 'WithStatement'] } },
+];
+```
 
 ## Release
 

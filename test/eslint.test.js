@@ -5,19 +5,25 @@ import base from '../eslint/index.js';
 import next from '../eslint/next.js';
 import node from '../eslint/node.js';
 
-async function ruleIdsFor({ config, code, filePath = 'src/fixture.ts' }) {
-  const eslint = new ESLint({ overrideConfigFile: true, overrideConfig: config });
-  const [result] = await eslint.lintText(code, { filePath });
-  return result.messages.map((message) => message.ruleId ?? message.message);
+const engines = new Map();
+
+async function findingsFor({ config, code, filePath = 'src/fixture.ts' }) {
+  if (!engines.has(config)) {
+    engines.set(config, new ESLint({ overrideConfigFile: true, overrideConfig: config }));
+  }
+  const [result] = await engines.get(config).lintText(code, { filePath });
+  return result.messages.map((message) => ({ ruleId: message.ruleId, message: message.message }));
+}
+
+async function ruleIdsFor(options) {
+  return (await findingsFor(options)).map((finding) => finding.ruleId ?? finding.message);
 }
 
 const violations = [
   ['curly', 'export function f(x: boolean) { if (x) return 1; return 2; }'],
   ['eqeqeq', 'export const same = (a: unknown, b: unknown) => a == b;'],
   ['default-case', 'export function f(x: string) { switch (x) { case "a": return 1; } return 2; }'],
-  ['id-denylist', 'export const cfg = 1;'],
   ['no-constant-condition', 'export function f() { while (true) { break; } }'],
-  ['no-restricted-syntax', 'export function f() { for (;;) { break; } }'],
   ['no-var', 'var count = 1; export { count };'],
   ['object-shorthand', 'const name = 1; export const record = { name: name };'],
   ['prefer-const', 'let count = 1; export { count };'],
@@ -41,10 +47,41 @@ const violations = [
   ['@typescript-eslint/no-unused-vars', 'const unused = 1;'],
 ];
 
+const restrictedSyntax = [
+  ['a loop with no stop condition in its header', 'export function f() { for (;;) { break; } }'],
+  ['an abbreviated variable', 'export const cfg = 1;'],
+  ['an abbreviated parameter', 'export const total = (items: number[], acc = 0) => acc;'],
+  [
+    'an abbreviated destructured name',
+    'export function f({ msg }: { msg: string }) { return msg; }',
+  ],
+  [
+    'an abbreviated catch parameter',
+    'export function f() { try { f(); } catch (evt) { throw evt; } }',
+  ],
+  ['an abbreviated array-destructured name', 'export const [res] = [1];'],
+  [
+    'an abbreviated destructured name with a default',
+    'export function f({ msg = "" }: { msg?: string }) { return msg; }',
+  ],
+  ['an abbreviated class field', 'export class A { private ctx = 1; }'],
+  ['an abbreviated method', 'export class A { public fn() { return 1; } }'],
+  [
+    'an abbreviated parameter property',
+    'export class A { constructor(private readonly cfg: number) {} }',
+  ],
+];
+
 describe('base ESLint config', () => {
   for (const [ruleId, code] of violations) {
     it(`reports ${ruleId}`, async () => {
       assert.ok((await ruleIdsFor({ config: base, code })).includes(ruleId));
+    });
+  }
+
+  for (const [what, code] of restrictedSyntax) {
+    it(`reports ${what}`, async () => {
+      assert.ok((await ruleIdsFor({ config: base, code })).includes('no-restricted-syntax'));
     });
   }
 
@@ -53,6 +90,8 @@ describe('base ESLint config', () => {
       'import type { ESLint } from "eslint";',
       'export type Shape = { names: string[] };',
       'export const modes = ["a", "b"] as const;',
+      'export const payload = { msg: "hi", res: 1 };',
+      'export const text = payload.msg;',
       'export class Counter {',
       '  private count = 0;',
       '  constructor(private readonly start: number) {}',
@@ -68,13 +107,23 @@ describe('base ESLint config', () => {
 
   it('reports an unused disable directive', async () => {
     const code = '// eslint-disable-next-line eqeqeq -- not needed\nexport const one = 1;';
-    const messages = await ruleIdsFor({ config: base, code });
-    assert.equal(messages.length, 1);
-    assert.match(messages[0], /Unused eslint-disable directive/);
+    const findings = await findingsFor({ config: base, code });
+    assert.equal(findings.length, 1);
+    assert.match(findings[0].message, /Unused eslint-disable directive/);
+  });
+
+  it('allows require() in a CommonJS file', async () => {
+    const code = 'const path = require("node:path");\nmodule.exports = path.sep;';
+    assert.deepEqual(await ruleIdsFor({ config: node, code, filePath: 'config.cjs' }), []);
   });
 });
 
 describe('node ESLint config', () => {
+  it('leaves accessibility modifiers to TypeScript files', async () => {
+    const code = 'export class Counter { increment() { return 1; } }';
+    assert.deepEqual(await ruleIdsFor({ config: node, code, filePath: 'bin/tool.js' }), []);
+  });
+
   it('knows Node globals in plain JS', async () => {
     const code = 'export const cwd = process.cwd();';
     assert.deepEqual(await ruleIdsFor({ config: node, code, filePath: 'bin/tool.js' }), []);
