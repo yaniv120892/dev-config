@@ -10,6 +10,10 @@ on:
         description: Fail on critical advisories in production dependencies.
         type: boolean
         default: false
+      ignore-scripts:
+        description: Install without lifecycle scripts, e.g. a library whose `prepare` builds it.
+        type: boolean
+        default: false
       build-node-options:
         description: NODE_OPTIONS for the build step, e.g. --max-old-space-size=4096.
         type: string
@@ -29,7 +33,7 @@ jobs:
         with:
           node-version: ${{ inputs.node-version }}
           cache: npm
-      - run: npm ci
+      - run: npm ci ${{ inputs.ignore-scripts && '--ignore-scripts' || '' }}
       - if: inputs.audit
         run: npm audit --omit=dev --audit-level=critical
       - run: npm run format:check
