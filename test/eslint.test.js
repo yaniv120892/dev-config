@@ -43,6 +43,7 @@ const violations = [
     '@typescript-eslint/explicit-member-accessibility',
     'export class Counter { count = 0; increment() { this.count += 1; } }',
   ],
+  ['@typescript-eslint/explicit-member-accessibility', 'export class Clock { constructor() {} }'],
   ['@typescript-eslint/no-non-null-assertion', 'export const f = (x?: string) => x!.length;'],
   ['@typescript-eslint/no-unused-vars', 'const unused = 1;'],
 ];
@@ -68,7 +69,7 @@ const restrictedSyntax = [
   ['an abbreviated method', 'export class A { public fn() { return 1; } }'],
   [
     'an abbreviated parameter property',
-    'export class A { constructor(private readonly cfg: number) {} }',
+    'export class A { public constructor(private readonly cfg: number) {} }',
   ],
 ];
 
@@ -94,7 +95,7 @@ describe('base ESLint config', () => {
       'export const text = payload.msg;',
       'export class Counter {',
       '  private count = 0;',
-      '  constructor(private readonly start: number) {}',
+      '  public constructor(private readonly start: number) {}',
       '  public increment(_by: number): number { this.count += this.start; return this.count; }',
       '}',
       'export async function load(engine: ESLint | null): Promise<number> {',

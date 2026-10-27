@@ -16,7 +16,7 @@ instead of carrying its own copy.
 ## Install
 
 ```bash
-npm install -D github:yaniv120892/dev-config#v0.1.0 eslint prettier typescript husky lint-staged
+npm install -D github:yaniv120892/dev-config#v0.1.1 eslint prettier typescript husky lint-staged
 ```
 
 A Next.js app also needs `eslint-config-next` at the version matching its `next`; a Node service
@@ -87,7 +87,7 @@ permissions:
   contents: read
 jobs:
   gate:
-    uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.1.0
+    uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.1.1
 ```
 
 A job that needs a database or a browser stays a separate job in the repo, calling the same
