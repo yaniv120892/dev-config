@@ -1,0 +1,59 @@
+{
+  "name": "@yaniv120892/dev-config",
+  "version": "0.1.0",
+  "description": "Shared ESLint, Prettier, tsconfig and lint-staged conventions for my repos",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    "./eslint": "./eslint/index.js",
+    "./eslint/node": "./eslint/node.js",
+    "./eslint/next": "./eslint/next.js",
+    "./prettier": "./prettier/index.js",
+    "./lint-staged": "./lint-staged/index.js",
+    "./tsconfig/*.json": "./tsconfig/*.json"
+  },
+  "files": [
+    "eslint",
+    "prettier",
+    "lint-staged",
+    "tsconfig"
+  ],
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "test": "node --test"
+  },
+  "prettier": "./prettier/index.js",
+  "dependencies": {
+    "@eslint-community/eslint-plugin-eslint-comments": "^4.8.1",
+    "@eslint/js": "^10.0.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-promise": "^7.3.0",
+    "globals": "^17.13.0",
+    "typescript-eslint": "^8.72.1"
+  },
+  "peerDependencies": {
+    "eslint": "^10.0.0",
+    "eslint-config-next": ">=16.0.0",
+    "prettier": "^3.0.0",
+    "typescript": ">=5.5.0 <6.1.0"
+  },
+  "peerDependenciesMeta": {
+    "eslint-config-next": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "eslint": "^10.13.0",
+    "eslint-config-next": "^16.4.3",
+    "next": "^16.4.3",
+    "prettier": "^3.9.10",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "typescript": "~6.0.3"
+  }
+}
