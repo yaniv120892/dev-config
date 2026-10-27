@@ -51,6 +51,12 @@ export const restrictedSyntax = [
     selector: abbreviatedDeclaration,
     message: 'Name it with full words, not an abbreviation.',
   },
+  {
+    // An interface inside `declare module` / `declare global` is an augmentation, which only
+    // declaration merging can express.
+    selector: 'TSInterfaceDeclaration:not(TSModuleBlock TSInterfaceDeclaration)',
+    message: 'Declare the shape with `type`, not `interface`.',
+  },
 ];
 
 export default defineConfig(
@@ -91,7 +97,6 @@ export default defineConfig(
       '@eslint-community/eslint-comments/require-description': 'error',
       '@typescript-eslint/array-type': 'error',
       '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
-      '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
       '@typescript-eslint/consistent-type-imports': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',

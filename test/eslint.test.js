@@ -34,7 +34,6 @@ const violations = [
   ],
   ['@typescript-eslint/array-type', 'export type Names = Array<string>;'],
   ['@typescript-eslint/consistent-type-assertions', 'export const n = JSON.parse("1") as number;'],
-  ['@typescript-eslint/consistent-type-definitions', 'export interface Shape { a: number }'],
   [
     '@typescript-eslint/consistent-type-imports',
     'import { ESLint } from "eslint"; export const x: ESLint | null = null;',
@@ -71,6 +70,7 @@ const restrictedSyntax = [
     'an abbreviated parameter property',
     'export class A { public constructor(private readonly cfg: number) {} }',
   ],
+  ['an interface for an ordinary shape', 'export interface Shape { a: number }'],
 ];
 
 describe('base ESLint config', () => {
@@ -85,6 +85,18 @@ describe('base ESLint config', () => {
       assert.ok((await ruleIdsFor({ config: base, code })).includes('no-restricted-syntax'));
     });
   }
+
+  it('accepts an interface that augments a module or the global scope', async () => {
+    const code = [
+      'declare module "@mui/material/styles" {',
+      '  interface Palette { charts: string[] }',
+      '  export interface PaletteOptions { charts?: string[] }',
+      '}',
+      'declare global { interface Window { analytics: unknown } }',
+      'export {};',
+    ].join('\n');
+    assert.deepEqual(await ruleIdsFor({ config: base, code }), []);
+  });
 
   it('accepts code that follows the conventions', async () => {
     const code = [
@@ -139,6 +151,6 @@ describe('next ESLint config', () => {
     ].join('\n');
     const ruleIds = await ruleIdsFor({ config: next, code, filePath: 'src/app/page.tsx' });
     assert.ok(ruleIds.includes('@next/next/no-img-element'));
-    assert.ok(ruleIds.includes('@typescript-eslint/consistent-type-definitions'));
+    assert.ok(ruleIds.includes('no-restricted-syntax'));
   });
 });
