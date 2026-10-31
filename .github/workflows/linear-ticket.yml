@@ -13,6 +13,7 @@ permissions: {}
 jobs:
   title:
     name: PR title names a Linear ticket
+    if: github.event_name != 'merge_group'
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
@@ -27,9 +28,11 @@ jobs:
             exit 0
           fi
           types='feat|fix|refactor|perf|test|docs|style|build|ci|chore|revert'
-          pattern="^(${types})\(${TEAM}-[1-9][0-9]*\)!?: [^ ]"
-          if [[ "$TITLE" =~ $pattern ]]; then
+          ticketed="(${types})\(([A-Z][A-Z0-9]*)-[1-9][0-9]*\)!?: [^ ]"
+          if [[ "$TITLE" =~ ^${ticketed} || "$TITLE" =~ ^Revert\ \"${ticketed}.*\"$ ]] &&
+            [ "${BASH_REMATCH[2]}" = "$TEAM" ]; then
             exit 0
           fi
-          echo "::error title=PR title has no Linear ticket::Title the PR '<type>(${TEAM}-123): <description>'. Got: '${TITLE}'"
+          echo "::error title=PR title has no Linear ticket::Title the PR '<type>(${TEAM}-123): <description>'."
+          printf 'Got: %s\n' "$TITLE"
           exit 1
