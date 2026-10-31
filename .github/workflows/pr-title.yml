@@ -1,0 +1,11 @@
+name: Linear ticket
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions: {}
+
+jobs:
+  linear-ticket:
+    uses: ./.github/workflows/linear-ticket.yml
