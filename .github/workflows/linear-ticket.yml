@@ -1,0 +1,38 @@
+name: Linear ticket
+
+on:
+  workflow_call:
+    inputs:
+      team-key:
+        description: The Linear team key the ticket ID starts with.
+        type: string
+        default: YAN
+
+permissions: {}
+
+jobs:
+  title:
+    name: PR title names a Linear ticket
+    if: github.event_name != 'merge_group'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      # The title goes through env, never into the script text: a crafted title would run as shell.
+      - env:
+          TITLE: ${{ github.event.pull_request.title }}
+          AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
+          TEAM: ${{ inputs.team-key }}
+        run: |
+          if [ "$AUTHOR_TYPE" = Bot ]; then
+            echo "Bot-authored PR: no ticket required."
+            exit 0
+          fi
+          types='feat|fix|refactor|perf|test|docs|style|build|ci|chore|revert'
+          ticketed="(${types})\(([A-Z][A-Z0-9]*)-[1-9][0-9]*\)!?: [^ ]"
+          if [[ "$TITLE" =~ ^${ticketed} || "$TITLE" =~ ^Revert\ \"${ticketed}.*\"$ ]] &&
+            [ "${BASH_REMATCH[2]}" = "$TEAM" ]; then
+            exit 0
+          fi
+          echo "::error title=PR title has no Linear ticket::Title the PR '<type>(${TEAM}-123): <description>'."
+          printf 'Got: %s\n' "$TITLE"
+          exit 1
