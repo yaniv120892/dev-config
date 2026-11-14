@@ -18,7 +18,7 @@ instead of carrying its own copy.
 ## Install
 
 ```bash
-npm install -D github:yaniv120892/dev-config#v0.1.7 eslint prettier typescript husky lint-staged
+npm install -D github:yaniv120892/dev-config#v0.1.8 eslint prettier typescript husky lint-staged
 ```
 
 A Next.js app also needs `eslint-config-next` at the version matching its `next` (install
@@ -91,7 +91,7 @@ permissions:
   contents: read
 jobs:
   gate:
-    uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.1.7
+    uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.1.8
 ```
 
 A job that needs a database or a browser stays a separate job in the repo, calling the same
@@ -119,7 +119,7 @@ permissions: {}
 
 jobs:
   linear-ticket:
-    uses: yaniv120892/dev-config/.github/workflows/linear-ticket.yml@v0.1.7
+    uses: yaniv120892/dev-config/.github/workflows/linear-ticket.yml@v0.1.8
 ```
 
 `edited` reruns the check when only the title changes; `synchronize` puts it on each new head
