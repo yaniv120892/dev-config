@@ -5,7 +5,7 @@ on:
     inputs:
       node-version:
         type: string
-        default: '22'
+        default: '26'
       audit:
         description: Fail on critical advisories in production dependencies.
         type: boolean
