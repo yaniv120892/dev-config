@@ -18,7 +18,7 @@ instead of carrying its own copy.
 ## Install
 
 ```bash
-npm install -D github:yaniv120892/dev-config#v0.1.8 eslint prettier typescript husky lint-staged
+npm install -D github:yaniv120892/dev-config#v0.2.0 eslint prettier typescript husky lint-staged
 ```
 
 A Next.js app also needs `eslint-config-next` at the version matching its `next` (install
@@ -91,7 +91,7 @@ permissions:
   contents: read
 jobs:
   gate:
-    uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.1.8
+    uses: yaniv120892/dev-config/.github/workflows/node-ci.yml@v0.2.0
 ```
 
 A job that needs a database or a browser stays a separate job in the repo, calling the same
@@ -119,7 +119,7 @@ permissions: {}
 
 jobs:
   linear-ticket:
-    uses: yaniv120892/dev-config/.github/workflows/linear-ticket.yml@v0.1.8
+    uses: yaniv120892/dev-config/.github/workflows/linear-ticket.yml@v0.2.0
 ```
 
 `edited` reruns the check when only the title changes; `synchronize` puts it on each new head
@@ -133,8 +133,8 @@ require checks on a private repo, so there it is a red X, not a block.
 
 `eslint/index.js` is the list. Its non-default rules enforce the code conventions in my Claude rules
 (`~/.claude/rules/code.md`, `typescript.md`), so review comments about braces, casts, `interface`
-or abbreviations become lint errors instead. CI runs lint with `--max-warnings=0`, so the rules
-`eslint-config-next` leaves at `warn` fail the gate too.
+or abbreviations become lint errors instead. CI and the lint-staged pre-commit hook both run
+eslint with `--max-warnings=0`, so the rules `eslint-config-next` leaves at `warn` fail them too.
 
 A repo that sets its own `no-restricted-syntax` replaces ours, since rule options do not merge.
 Spread ours back in:
@@ -152,5 +152,7 @@ export default [
 
 1. Bump `version` in `package.json` in the same PR as the change. Vercel caches a git dependency
    by version, so a same-version change never reaches a deployed app.
-2. After the squash-merge, tag the merge commit: `gh release create v<version> --generate-notes`.
+2. After the squash-merge, tag the merge commit:
+   `gh release create v<version> --target <full 40-char merge-commit SHA> --generate-notes`.
+   Without `--target`, the tag lands on whatever `main` points at, and a short SHA fails with 422.
 3. Consumers bump the tag in both `package.json` and their CI `uses:` line.

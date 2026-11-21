@@ -4,6 +4,7 @@ on:
   workflow_call:
     inputs:
       node-version:
+        description: Node version to run the gate on.
         type: string
         default: '26'
       audit:
