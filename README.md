@@ -133,8 +133,8 @@ require checks on a private repo, so there it is a red X, not a block.
 
 `eslint/index.js` is the list. Its non-default rules enforce the code conventions in my Claude rules
 (`~/.claude/rules/code.md`, `typescript.md`), so review comments about braces, casts, `interface`
-or abbreviations become lint errors instead. CI runs lint with `--max-warnings=0`, so the rules
-`eslint-config-next` leaves at `warn` fail the gate too.
+or abbreviations become lint errors instead. CI and the lint-staged pre-commit hook both run
+eslint with `--max-warnings=0`, so the rules `eslint-config-next` leaves at `warn` fail them too.
 
 A repo that sets its own `no-restricted-syntax` replaces ours, since rule options do not merge.
 Spread ours back in:
